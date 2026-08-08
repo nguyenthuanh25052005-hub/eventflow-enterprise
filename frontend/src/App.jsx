@@ -14,6 +14,8 @@ import Attendees from "./pages/Attendees";
 import Finance from "./pages/Finance";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Employees from "./pages/Employees";
+import Departments from "./pages/Departments";
 export default function App() {
   return (
     <BrowserRouter>
@@ -38,6 +40,8 @@ export default function App() {
           <Route path="/finance" element={<Finance />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/departments" element={<Departments />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
