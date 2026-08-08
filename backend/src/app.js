@@ -13,7 +13,24 @@ import attendeeRoutes from "./routes/attendee.routes.js";
 import supplierRoutes from "./routes/supplier.routes.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked origin: ${origin}`));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json({ limit: "2mb" }));
 app.use(morgan("dev"));
 app.get("/api/health", (req, res) =>
