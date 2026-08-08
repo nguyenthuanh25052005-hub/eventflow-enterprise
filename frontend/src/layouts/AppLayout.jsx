@@ -8,6 +8,8 @@ import {
   ListTodo,
   WalletCards,
   ContactRound,
+  UsersRound,
+  Network,
   ScanLine,
   Truck,
   BarChart3,
@@ -47,6 +49,13 @@ const groups = [
     ],
   },
   {
+    label: "People",
+    items: [
+      ["/employees", "Employees", UsersRound],
+      ["/departments", "Departments", Network],
+    ],
+  },
+  {
     label: "Business",
     items: [
       ["/finance", "Finance", WalletCards],
@@ -67,6 +76,8 @@ const pageNames = {
   tasks: "Tasks",
   suppliers: "Suppliers",
   attendees: "Attendees & Check-in",
+  employees: "Employees",
+  departments: "Departments",
   finance: "Finance",
   reports: "Reports",
   settings: "Settings",
