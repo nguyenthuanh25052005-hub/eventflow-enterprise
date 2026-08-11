@@ -1,0 +1,43 @@
+.event-supplier-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.event-supplier-status.proposed {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.event-supplier-status.requested {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.event-supplier-status.confirmed {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.event-supplier-status.in-progress {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.event-supplier-status.completed {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.event-supplier-status.cancelled {
+  background: #fef2f2;
+  color: #b91c1c;
+}

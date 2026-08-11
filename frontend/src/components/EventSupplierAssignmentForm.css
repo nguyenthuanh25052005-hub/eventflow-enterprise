@@ -1,0 +1,179 @@
+.event-supplier-manager__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.event-supplier-manager__grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    color: #5f6670;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.event-supplier-manager__grid label.full {
+    grid-column: 1 / -1;
+}
+
+.event-supplier-manager__grid input,
+.event-supplier-manager__grid select,
+.event-supplier-manager__grid textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #dfe3e8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #454b54;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.event-supplier-manager__grid input,
+.event-supplier-manager__grid select {
+    height: 40px;
+    padding: 0 11px;
+}
+
+.event-supplier-manager__grid textarea {
+    min-height: 88px;
+    padding: 10px 11px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.event-supplier-manager__grid input::placeholder,
+.event-supplier-manager__grid textarea::placeholder {
+    color: #a7adb5;
+}
+
+.event-supplier-manager__grid input:focus,
+.event-supplier-manager__grid select:focus,
+.event-supplier-manager__grid textarea:focus {
+    border-color: #8e969f;
+    box-shadow: 0 0 0 3px rgba(80, 87, 95, 0.07);
+}
+
+.event-supplier-manager__grid input:disabled,
+.event-supplier-manager__grid select:disabled,
+.event-supplier-manager__grid textarea:disabled {
+    background: #f5f6f7;
+    color: #9ba1a8;
+    cursor: not-allowed;
+}
+
+.event-supplier-manager__grid select {
+    cursor: pointer;
+}
+
+.event-supplier-manager__grid select:disabled {
+    cursor: not-allowed;
+}
+
+.event-supplier-manager__grid input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.event-supplier-manager__grid input[type="number"]::-webkit-inner-spin-button,
+.event-supplier-manager__grid input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+.event-supplier-manager__grid input[type="date"] {
+    cursor: pointer;
+}
+
+.event-supplier-manager__form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #edf0f3;
+}
+
+.event-supplier-manager__form-actions button {
+    min-width: 96px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.event-supplier-manager__form-actions button[type="button"] {
+    border: 1px solid #dfe3e8;
+    background: #ffffff;
+    color: #69717a;
+}
+
+.event-supplier-manager__form-actions button[type="button"]:hover:not(:disabled) {
+    background: #f7f8f9;
+    border-color: #d4d9de;
+}
+
+.event-supplier-manager__form-actions button[type="submit"] {
+    border: 1px solid #30353c;
+    background: #30353c;
+    color: #ffffff;
+}
+
+.event-supplier-manager__form-actions button[type="submit"]:hover:not(:disabled) {
+    background: #41474e;
+    border-color: #41474e;
+}
+
+.event-supplier-manager__form-actions button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+    .event-supplier-manager__grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .event-supplier-manager__grid label.full {
+        grid-column: auto;
+    }
+
+    .event-supplier-manager__form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .event-supplier-manager__form-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .event-supplier-manager__grid input,
+    .event-supplier-manager__grid select {
+        height: 42px;
+    }
+
+    .event-supplier-manager__grid textarea {
+        min-height: 100px;
+    }
+}
