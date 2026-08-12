@@ -10,9 +10,11 @@ import eventRoutes from "./routes/event.routes.js";
 import taskRoutes from "./routes/task.routes.js";
 import financeRoutes from "./routes/finance.routes.js";
 import attendeeRoutes from "./routes/attendee.routes.js";
-import supplierRoutes from "./routes/supplier.routes.js";
+import supplierRoutes from "./routes/Supplier.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
+import eventSupplierRoutes from "./routes/eventSupplier.routes.js";
+import eventSupplierWorkflowRoutes from "./routes/eventSupplierWorkflow.routes.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
@@ -35,6 +37,11 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/attendees", attendeeRoutes);
 app.use("/api/suppliers", supplierRoutes);
+app.use("/api/event-suppliers", eventSupplierRoutes);
+app.use(
+  "/api/event-supplier-workflow",
+  eventSupplierWorkflowRoutes,
+);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use(notFound);

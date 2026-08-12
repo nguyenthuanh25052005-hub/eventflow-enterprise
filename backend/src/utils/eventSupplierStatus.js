@@ -1,0 +1,8 @@
+export const EVENT_SUPPLIER_STATUSES = [
+  "PROPOSED",
+  "REQUESTED",
+  "CONFIRMED",
+  "IN_PROGRESS",
+  "COMPLETED",
+  "CANCELLED",
+];
