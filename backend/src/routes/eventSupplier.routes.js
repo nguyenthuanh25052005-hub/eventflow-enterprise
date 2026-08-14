@@ -12,6 +12,7 @@ const router = Router();
 
 router.use(protect);
 router.get("/", listEventSuppliers);
+router.get("/statuses", getEventSupplierStatuses);
 router.get("/:id", getEventSupplier);
 router.post("/", createEventSupplier);
 router.put("/:id", updateEventSupplier);

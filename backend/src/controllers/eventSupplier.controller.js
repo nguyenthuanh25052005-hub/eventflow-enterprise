@@ -3,8 +3,7 @@ import Event from "../models/Event.js";
 import Supplier from "../models/Supplier.js";
 import { EVENT_SUPPLIER_STATUSES } from "../utils/eventSupplierStatus.js";
 
-const supplierSelect =
-  "supplierCode name category contactName phone email";
+const supplierSelect = "supplierCode name category contactName phone email";
 
 const eventSelect = "eventCode name";
 
@@ -40,7 +39,12 @@ export async function getEventSupplier(req, res) {
 
   res.json(item);
 }
-
+export function getEventSupplierStatuses(req, res) {
+  return res.json({
+    success: true,
+    data: EVENT_SUPPLIER_STATUSES,
+  });
+}
 export async function createEventSupplier(req, res) {
   const {
     event,
@@ -62,10 +66,7 @@ export async function createEventSupplier(req, res) {
     });
   }
 
-  if (
-    status &&
-    !EVENT_SUPPLIER_STATUSES.includes(status)
-  ) {
+  if (status && !EVENT_SUPPLIER_STATUSES.includes(status)) {
     return res.status(400).json({
       message: "Invalid event supplier status",
     });
@@ -95,8 +96,7 @@ export async function createEventSupplier(req, res) {
 
   if (existing) {
     return res.status(409).json({
-      message:
-        "This supplier is already assigned to the event",
+      message: "This supplier is already assigned to the event",
     });
   }
 
@@ -171,10 +171,7 @@ export async function updateEventSupplier(req, res) {
   res.json(populated);
 }
 
-export async function updateEventSupplierStatus(
-  req,
-  res,
-) {
+export async function updateEventSupplierStatus(req, res) {
   const { status } = req.body;
 
   if (!status) {
