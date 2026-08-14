@@ -9,6 +9,7 @@ import Task from "../models/Task.js";
 import Expense from "../models/Expense.js";
 import Attendee from "../models/Attendee.js";
 import Supplier from "../models/Supplier.js";
+import EventSupplier from "../models/EventSupplier.js";
 
 const addDays = (n) => new Date(Date.now() + n * 86400000);
 const createSequentially = async (Model, items) => {
@@ -555,7 +556,7 @@ for (const [event, count, checked] of [
 // SUPPLIERS
 // =========================
 
-await createSequentially(Supplier, [
+const suppliers = await createSequentially(Supplier, [
   {
     name: "StagePro Vietnam",
     category: "PRODUCTION",
@@ -628,6 +629,38 @@ await createSequentially(Supplier, [
 
     rating: 4.3,
 
+    createdBy: admin._id,
+  },
+]);
+
+const stagePro = suppliers.find((s) => s.name === "StagePro Vietnam");
+const lumina = suppliers.find((s) => s.name === "Lumina Lighting");
+
+await EventSupplier.deleteMany({});
+
+await createSequentially(EventSupplier, [
+  {
+    event: event1._id,
+    supplier: stagePro._id,
+    service: "Production",
+    description: "Main stage and set production for annual summit.",
+    quotationValue: 250000000,
+    contractValue: 220000000,
+    status: "CONFIRMED",
+    contactPerson: "Duc Nguyen",
+    notes: "Confirmed vendor for stage build and production execution.",
+    createdBy: admin._id,
+  },
+  {
+    event: event1._id,
+    supplier: lumina._id,
+    service: "Lighting",
+    description: "LED and lighting package for keynote and stage.",
+    quotationValue: 150000000,
+    contractValue: 120000000,
+    status: "REQUESTED",
+    contactPerson: "Khanh Le",
+    notes: "Awaiting final approval and contract sign-off.",
     createdBy: admin._id,
   },
 ]);

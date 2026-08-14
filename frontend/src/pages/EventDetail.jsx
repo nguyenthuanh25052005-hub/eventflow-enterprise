@@ -20,6 +20,7 @@ import { taskApi } from "../api/taskApi";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
 import { money, number, shortDate } from "../utils/format";
+import EventSupplierAssignment from "../components/EventSupplierAssignment";
 
 const taskInit = {
   title: "",
@@ -269,6 +270,7 @@ export default function EventDetail() {
                 )}
               </div>
             </section>
+            <EventSupplierAssignment eventId={id} />
           </>
         )}
         {tab === "tasks" && <TaskTab tasks={e.tasks || []} onRefresh={load} />}
