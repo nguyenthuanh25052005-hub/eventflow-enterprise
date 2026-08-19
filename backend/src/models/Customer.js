@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { nextSequenceCode } from "../utils/sequence.js";
 
 const contactPersonSchema = new mongoose.Schema(
   {
@@ -40,8 +41,12 @@ const customerSchema = new mongoose.Schema(
 
 customerSchema.pre("save", async function nextCode() {
   if (this.customerCode) return;
-  const count = await mongoose.model("Customer").countDocuments();
-  this.customerCode = `CUS${String(count + 1).padStart(5, "0")}`;
+  this.customerCode = await nextSequenceCode({
+    model: mongoose.model("Customer"),
+    counterKey: "customer",
+    field: "customerCode",
+    prefix: "CUS",
+  });
 });
 
 export default mongoose.model("Customer", customerSchema);

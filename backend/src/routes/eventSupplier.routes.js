@@ -1,9 +1,11 @@
 ﻿import { Router } from "express";
 import { protect } from "../middleware/auth.js";
+
 import {
   createEventSupplier,
   deleteEventSupplier,
   getEventSupplier,
+  getEventSupplierStatuses,
   listEventSuppliers,
   updateEventSupplier,
 } from "../controllers/eventSupplier.controller.js";
@@ -11,9 +13,14 @@ import {
 const router = Router();
 
 router.use(protect);
+
+// Route cố định phải đứng trước /:id
+router.get("/statuses", getEventSupplierStatuses);
+
 router.get("/", listEventSuppliers);
-router.get("/:id", getEventSupplier);
 router.post("/", createEventSupplier);
+
+router.get("/:id", getEventSupplier);
 router.put("/:id", updateEventSupplier);
 router.delete("/:id", deleteEventSupplier);
 

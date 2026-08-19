@@ -28,45 +28,34 @@ export default function EventSupplierAssignment({ eventId }) {
     try {
       setError("");
 
-      const [
-        supplierResponse,
-        eventSupplierResponse,
-        statusResponse,
-      ] = await Promise.all([
-        client.get("/suppliers"),
-        eventSupplierApi.list(eventId),
-        client.get("/event-suppliers/statuses"),
-      ]);
+      const [supplierResponse, eventSupplierResponse, statusResponse] =
+        await Promise.all([
+          client.get("/suppliers"),
+          eventSupplierApi.list(eventId),
+          client.get("/event-suppliers/statuses"),
+        ]);
 
       const supplierData =
+        supplierResponse.data?.items ||
         supplierResponse.data?.data ||
         supplierResponse.data?.suppliers ||
         supplierResponse.data ||
         [];
 
       const eventSupplierData =
-        eventSupplierResponse.data?.data ||
-        eventSupplierResponse.data ||
-        [];
+        eventSupplierResponse.data?.data || eventSupplierResponse.data || [];
 
-      const statusData =
-        statusResponse.data?.data ||
-        statusResponse.data ||
-        [];
+      const statusData = statusResponse.data?.data || statusResponse.data || [];
 
       const normalizedSuppliers = Array.isArray(supplierData)
         ? supplierData
         : [];
 
-      const normalizedEventSuppliers = Array.isArray(
-        eventSupplierData,
-      )
+      const normalizedEventSuppliers = Array.isArray(eventSupplierData)
         ? eventSupplierData
         : [];
 
-      const normalizedStatuses = Array.isArray(statusData)
-        ? statusData
-        : [];
+      const normalizedStatuses = Array.isArray(statusData) ? statusData : [];
 
       setSuppliers(normalizedSuppliers);
       setItems(normalizedEventSuppliers);
@@ -74,15 +63,11 @@ export default function EventSupplierAssignment({ eventId }) {
 
       setForm((current) => ({
         ...current,
-        status:
-          current.status ||
-          normalizedStatuses[0] ||
-          "",
+        status: current.status || normalizedStatuses[0] || "",
       }));
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          "Không thể tải thông tin supplier.",
+        err.response?.data?.message || "Không thể tải thông tin supplier.",
       );
     }
   }
@@ -110,12 +95,8 @@ export default function EventSupplierAssignment({ eventId }) {
         supplier: form.supplier,
         service: form.service.trim(),
         description: form.description,
-        quotationValue: Number(
-          form.quotationValue || 0,
-        ),
-        contractValue: Number(
-          form.contractValue || 0,
-        ),
+        quotationValue: Number(form.quotationValue || 0),
+        contractValue: Number(form.contractValue || 0),
         status: form.status || undefined,
         contactPerson: form.contactPerson,
         notes: form.notes,
@@ -131,8 +112,7 @@ export default function EventSupplierAssignment({ eventId }) {
       await load();
     } catch (err) {
       setError(
-        err.response?.data?.message ||
-          "Không thể gán supplier cho event.",
+        err.response?.data?.message || "Không thể gán supplier cho event.",
       );
     } finally {
       setSaving(false);
@@ -143,28 +123,18 @@ export default function EventSupplierAssignment({ eventId }) {
     try {
       setError("");
 
-      await client.patch(
-        `/event-supplier-workflow/${item._id}/status`,
-        {
-          status,
-        },
-      );
+      await client.patch(`/event-supplier-workflow/${item._id}/status`, {
+        status,
+      });
 
       await load();
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Không thể cập nhật supplier.",
-      );
+      setError(err.response?.data?.message || "Không thể cập nhật supplier.");
     }
   }
 
   async function remove(item) {
-    if (
-      !window.confirm(
-        `Remove ${item.supplier?.name || "supplier"}?`,
-      )
-    ) {
+    if (!window.confirm(`Remove ${item.supplier?.name || "supplier"}?`)) {
       return;
     }
 
@@ -175,10 +145,7 @@ export default function EventSupplierAssignment({ eventId }) {
 
       await load();
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Không thể xóa supplier.",
-      );
+      setError(err.response?.data?.message || "Không thể xóa supplier.");
     }
   }
 
@@ -204,17 +171,10 @@ export default function EventSupplierAssignment({ eventId }) {
         </button>
       </div>
 
-      {error && (
-        <div className="form-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="form-error">{error}</div>}
 
       {open && (
-        <form
-          className="form-grid"
-          onSubmit={submit}
-        >
+        <form className="form-grid" onSubmit={submit}>
           <label>
             Supplier
             <select
@@ -227,20 +187,12 @@ export default function EventSupplierAssignment({ eventId }) {
                 })
               }
             >
-              <option value="">
-                Select supplier
-              </option>
+              <option value="">Select supplier</option>
 
               {suppliers
-                .filter(
-                  (supplier) =>
-                    supplier.status !== "INACTIVE",
-                )
+                .filter((supplier) => supplier.status !== "INACTIVE")
                 .map((supplier) => (
-                  <option
-                    key={supplier._id}
-                    value={supplier._id}
-                  >
+                  <option key={supplier._id} value={supplier._id}>
                     {supplier.name}
                   </option>
                 ))}
@@ -303,15 +255,10 @@ export default function EventSupplierAssignment({ eventId }) {
                 })
               }
             >
-              <option value="">
-                Select status
-              </option>
+              <option value="">Select status</option>
 
               {statuses.map((status) => (
-                <option
-                  key={status}
-                  value={status}
-                >
+                <option key={status} value={status}>
                   {status}
                 </option>
               ))}
@@ -376,9 +323,7 @@ export default function EventSupplierAssignment({ eventId }) {
               className="primary-button"
               disabled={saving || !statuses.length}
             >
-              {saving
-                ? "Saving..."
-                : "Assign Supplier"}
+              {saving ? "Saving..." : "Assign Supplier"}
             </button>
           </div>
         </form>
@@ -386,40 +331,22 @@ export default function EventSupplierAssignment({ eventId }) {
 
       <div className="milestone-table">
         {items.map((item) => (
-          <div
-            className="milestone-row"
-            key={item._id}
-          >
+          <div className="event-supplier-row" key={item._id}>
             <div>
-              <strong>
-                {item.supplier?.name ||
-                  "Unknown Supplier"}
-              </strong>
+              <strong>{item.supplier?.name || "Unknown Supplier"}</strong>
 
               <span>
                 {item.service} ·{" "}
-                {money(
-                  item.contractValue ||
-                    item.quotationValue ||
-                    0,
-                )}
+                {money(item.contractValue || item.quotationValue || 0)}
               </span>
             </div>
 
             <select
               value={item.status || ""}
-              onChange={(e) =>
-                updateStatus(
-                  item,
-                  e.target.value,
-                )
-              }
+              onChange={(e) => updateStatus(item, e.target.value)}
             >
               {statuses.map((status) => (
-                <option
-                  key={status}
-                  value={status}
-                >
+                <option key={status} value={status}>
                   {status}
                 </option>
               ))}

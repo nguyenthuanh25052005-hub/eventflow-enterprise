@@ -390,12 +390,13 @@ export default function EventRequests() {
                     <span className="panel-kicker">COMMERCIAL</span>
                     <h3>Quotations</h3>
                   </div>
-                  {!detail.quotations?.length && (
-                    <button className="secondary-button" onClick={makeQuote}>
-                      <Plus size={15} />
-                      Create quotation
-                    </button>
-                  )}
+                  {detail.status === "QUALIFYING" &&
+                    !detail.quotations?.length && (
+                      <button className="secondary-button" onClick={makeQuote}>
+                        <Plus size={15} />
+                        Create quotation
+                      </button>
+                    )}
                 </div>
                 {detail.quotations?.length ? (
                   detail.quotations.map((q) => (
@@ -409,11 +410,19 @@ export default function EventRequests() {
                       <div className="quote-total">{money(q.total)}</div>
                       <StatusBadge value={q.status} />
                       <div className="quote-actions">
-                        {q.status === "DRAFT" && (
-                          <button onClick={() => updateQuote(q, "SENT")}>
-                            Send
-                          </button>
-                        )}
+                        {q.status === "DRAFT" &&
+                          detail.status === "QUOTATION" && (
+                            <button onClick={() => updateQuote(q, "SENT")}>
+                              Send
+                            </button>
+                          )}
+
+                        {q.status === "SENT" &&
+                          detail.status === "NEGOTIATING" && (
+                            <button onClick={() => updateQuote(q, "APPROVED")}>
+                              Approve
+                            </button>
+                          )}
                         {q.status === "SENT" && (
                           <button onClick={() => updateQuote(q, "APPROVED")}>
                             Approve
@@ -430,21 +439,55 @@ export default function EventRequests() {
               </div>
             </div>
             <aside className="detail-side">
-              <div className="detail-side-card">
-                <span className="panel-kicker">NEXT ACTION</span>
-                <h3>Move opportunity</h3>
-                <div className="stage-actions">
-                  {stages
-                    .filter((s) => s !== detail.status)
-                    .slice(0, 5)
-                    .map((s) => (
-                      <button key={s} onClick={() => move(s)}>
-                        <StatusBadge value={s} />
-                        <ArrowRight size={14} />
-                      </button>
-                    ))}
+              {detail.status === "NEW" && (
+                <div className="detail-side-card">
+                  <span className="panel-kicker">NEXT ACTION</span>
+                  <h3>Qualification</h3>
+
+                  <div className="stage-actions">
+                    <button onClick={() => move("QUALIFYING")}>
+                      <span>Start qualification</span>
+                      <ArrowRight size={14} />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {detail.status === "QUALIFYING" && (
+                <div className="detail-side-card">
+                  <span className="panel-kicker">NEXT ACTION</span>
+                  <h3>Create quotation</h3>
+                  <p>Prepare a commercial quotation for this opportunity.</p>
+                </div>
+              )}
+
+              {detail.status === "QUOTATION" && (
+                <div className="detail-side-card">
+                  <span className="panel-kicker">NEXT ACTION</span>
+                  <h3>Send quotation</h3>
+                  <p>Send the draft quotation to move into negotiation.</p>
+                </div>
+              )}
+
+              {detail.status === "NEGOTIATING" && (
+                <div className="detail-side-card">
+                  <span className="panel-kicker">NEXT ACTION</span>
+                  <h3>Customer decision</h3>
+                  <p>
+                    Approve the sent quotation when the customer accepts it.
+                  </p>
+                </div>
+              )}
+
+              {detail.status === "CONVERTED" && (
+                <div className="detail-side-card">
+                  <span className="panel-kicker">WORKFLOW COMPLETE</span>
+                  <h3>Converted to event</h3>
+                  <p>
+                    This opportunity has already been handed over to operations.
+                  </p>
+                </div>
+              )}
               {detail.status === "APPROVED" && (
                 <div className="handoff-card">
                   <strong>Commercial approval complete</strong>
