@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { protect, allowRoles } from "../middleware/auth.js";
+import { protect, allowRoles, internalOnly } from "../middleware/auth.js";
 import {
   listSuppliers,
   createSupplier,
   updateSupplier,
 } from "../controllers/supplier.controller.js";
 const router = Router();
-router.use(protect);
+router.use(protect, internalOnly);
 router.get("/", listSuppliers);
 router.post(
   "/",

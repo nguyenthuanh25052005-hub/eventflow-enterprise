@@ -29,3 +29,11 @@ export function allowRoles(...roles) {
     next();
   };
 }
+export const internalOnly = allowRoles(
+  "SUPER_ADMIN",
+  "ADMIN",
+  "EVENT_MANAGER",
+  "SALES",
+  "FINANCE",
+  "STAFF",
+);

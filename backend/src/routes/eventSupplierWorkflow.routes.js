@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect } from "../middleware/auth.js";
+import { protect, internalOnly } from "../middleware/auth.js";
 
 import {
   updateEventSupplierStatus,
@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-router.use(protect);
+router.use(protect, internalOnly);
 
 router.patch("/:id/status", updateEventSupplierStatus);
 
