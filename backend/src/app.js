@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+
 import authRoutes from "./routes/auth.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
@@ -15,8 +16,12 @@ import employeeRoutes from "./routes/employee.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
 import eventSupplierRoutes from "./routes/eventSupplier.routes.js";
 import eventSupplierWorkflowRoutes from "./routes/eventSupplierWorkflow.routes.js";
+import customerPortalRoutes from "./routes/customerPortal.routes.js";
+
 import { errorHandler, notFound } from "./middleware/error.js";
+
 const app = express();
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -35,16 +40,33 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json({ limit: "2mb" }));
+
+app.use(
+  express.json({
+    limit: "2mb",
+  }),
+);
+
 app.use(morgan("dev"));
-app.get("/api/health", (req, res) =>
+
+app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
     service: "EventFlow Enterprise API",
     version: "0.2",
-  }),
-);
+  });
+});
+
+// =====================================
+// PUBLIC / AUTH
+// =====================================
+
 app.use("/api/auth", authRoutes);
+
+// =====================================
+// INTERNAL APIs
+// =====================================
+
 app.use("/api/customers", customerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/event-requests", eventRequestRoutes);
@@ -54,13 +76,26 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/attendees", attendeeRoutes);
 app.use("/api/suppliers", supplierRoutes);
+
 app.use("/api/event-suppliers", eventSupplierRoutes);
-app.use(
-  "/api/event-supplier-workflow",
-  eventSupplierWorkflowRoutes,
-);
+
+app.use("/api/event-supplier-workflow", eventSupplierWorkflowRoutes);
+
 app.use("/api/employees", employeeRoutes);
 app.use("/api/departments", departmentRoutes);
+
+// =====================================
+// CUSTOMER PORTAL
+// =====================================
+
+app.use("/api/customer-portal", customerPortalRoutes);
+
+// =====================================
+// ERROR HANDLERS
+// Luôn phải nằm cuối cùng
+// =====================================
+
 app.use(notFound);
 app.use(errorHandler);
+
 export default app;

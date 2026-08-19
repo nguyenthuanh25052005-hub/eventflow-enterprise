@@ -37,3 +37,4 @@ export const internalOnly = allowRoles(
   "FINANCE",
   "STAFF",
 );
+export const customerOnly = allowRoles("CUSTOMER");
