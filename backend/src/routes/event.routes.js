@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { protect, allowRoles } from "../middleware/auth.js";
+import { protect, allowRoles, internalOnly } from "../middleware/auth.js";
 import {
   listEvents,
   getEvent,
   updateEvent,
 } from "../controllers/event.controller.js";
 const router = Router();
-router.use(protect);
+router.use(protect, internalOnly);
 router.get("/", listEvents);
 router.get("/:id", getEvent);
 router.put(

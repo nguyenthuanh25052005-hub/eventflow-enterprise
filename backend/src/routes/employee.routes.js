@@ -7,10 +7,10 @@ import {
   listEmployees,
   updateEmployee,
 } from "../controllers/employee.controller.js";
-import { allowRoles, protect } from "../middleware/auth.js";
+import { allowRoles, protect, internalOnly } from "../middleware/auth.js";
 
 const router = Router();
-router.use(protect);
+router.use(protect, internalOnly);
 router.get("/", listEmployees);
 router.get("/code/:employeeCode", getEmployeeByCode);
 router.get("/:id", getEmployee);
