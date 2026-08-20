@@ -3467,3 +3467,247 @@ textarea {
   display: grid;
   place-items: center;
 }
+
+/* =========================================================
+   CUSTOMER PORTAL
+   Scoped styles - do not affect internal EventFlow pages
+   ========================================================= */
+
+.customer-portal .page {
+  width: 100%;
+  padding: 32px;
+}
+
+.customer-portal .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.customer-portal .page-header h1 {
+  margin: 4px 0 8px;
+  line-height: 1.15;
+}
+
+.customer-portal .page-header .muted {
+  margin: 0;
+}
+
+.customer-portal .panel {
+  width: 100%;
+  padding: 24px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* ---------- Buttons ---------- */
+
+.customer-portal button:not(.icon-button) {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid #d8dee8;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.customer-portal button:not(.icon-button):hover:not(:disabled) {
+  background: #f7f9fc;
+  border-color: #bec8d8;
+}
+
+.customer-portal button:not(.icon-button):active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.customer-portal button:not(.icon-button):disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.customer-portal .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-color: #111b2e;
+  background: #111b2e;
+  color: #ffffff;
+}
+
+.customer-portal .primary-button:hover:not(:disabled) {
+  border-color: #1d2d49;
+  background: #1d2d49;
+}
+
+/* ---------- Tables ---------- */
+
+.customer-portal .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.customer-portal table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.customer-portal th,
+.customer-portal td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid #edf0f5;
+  overflow-wrap: break-word;
+}
+
+.customer-portal th {
+  color: #172033;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.customer-portal tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.customer-portal tbody tr[style*="cursor"] {
+  transition: background 0.15s ease;
+}
+
+.customer-portal tbody tr[style*="cursor"]:hover {
+  background: #f7f9fc;
+}
+
+/* My Requests */
+.customer-portal table th:nth-child(1),
+.customer-portal table td:nth-child(1) {
+  width: 13%;
+}
+
+.customer-portal table th:nth-child(2),
+.customer-portal table td:nth-child(2) {
+  width: 27%;
+}
+
+.customer-portal table th:nth-child(3),
+.customer-portal table td:nth-child(3) {
+  width: 15%;
+}
+
+.customer-portal table th:nth-child(4),
+.customer-portal table td:nth-child(4) {
+  width: 19%;
+}
+
+.customer-portal table th:nth-child(5),
+.customer-portal table td:nth-child(5) {
+  width: 12%;
+}
+
+.customer-portal table th:nth-child(6),
+.customer-portal table td:nth-child(6) {
+  width: 14%;
+}
+
+/* ---------- Forms ---------- */
+
+.customer-portal form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #172033;
+  font-weight: 600;
+}
+
+.customer-portal input,
+.customer-portal select,
+.customer-portal textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.customer-portal textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.customer-portal input:focus,
+.customer-portal select:focus,
+.customer-portal textarea:focus {
+  border-color: #8495b0;
+  box-shadow: 0 0 0 3px rgba(80, 105, 145, 0.12);
+}
+
+/* ---------- Request / Quotation / Event detail ---------- */
+
+.customer-portal .panel h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.customer-portal .panel h3 {
+  margin-top: 22px;
+  margin-bottom: 10px;
+}
+
+.customer-portal .panel p {
+  line-height: 1.6;
+}
+
+.customer-portal .error-box {
+  padding: 13px 16px;
+  margin-bottom: 18px;
+  border: 1px solid #efc5c5;
+  border-radius: 9px;
+  background: #fff6f6;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .customer-portal .page {
+    padding: 22px;
+  }
+
+  .customer-portal .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .customer-portal .page-header > button,
+  .customer-portal .page-header .primary-button {
+    align-self: flex-start;
+  }
+
+  .customer-portal table {
+    min-width: 820px;
+    table-layout: auto;
+  }
+
+  .customer-portal th,
+  .customer-portal td {
+    white-space: nowrap;
+  }
+}
