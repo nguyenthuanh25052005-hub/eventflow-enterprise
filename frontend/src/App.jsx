@@ -20,22 +20,6 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Employees from "./pages/Employees";
 import Departments from "./pages/Departments";
-import CustomerLayout from "./layouts/CustomerLayout";
-import CustomerDashboard from "./pages/customer/CustomerDashboard";
-import MyCompany from "./pages/customer/MyCompany";
-import MyProfile from "./pages/customer/MyProfile";
-import CustomerRequests from "./pages/customer/CustomerRequests";
-import CreateCustomerRequest from "./pages/customer/CreateCustomerRequest";
-import CustomerRequestDetail from "./pages/customer/CustomerRequestDetail";
-import CustomerQuotations from "./pages/customer/CustomerQuotations";
-import CustomerQuotationDetail from "./pages/customer/CustomerQuotationDetail";
-import CustomerEvents from "./pages/customer/CustomerEvents";
-import CustomerEventDetail from "./pages/customer/CustomerEventDetail";
-import PublicHome from "./pages/public/PublicHome";
-import "./styles/customer.css";
-import "./styles/customer-workflow.css";
-import "./styles/public.css";
-import "./styles/public-enhancements.css";
 
 const INTERNAL_ROLES = [
   "SUPER_ADMIN",
@@ -46,13 +30,87 @@ const INTERNAL_ROLES = [
   "STAFF",
 ];
 
+function CustomerPortalPlaceholder() {
+  const rawUser = localStorage.getItem("eventflow_user");
+
+  let user = null;
+
+  try {
+    user = rawUser ? JSON.parse(rawUser) : null;
+  } catch {
+    user = null;
+  }
+
+  function logout() {
+    localStorage.removeItem("eventflow_token");
+    localStorage.removeItem("eventflow_user");
+    window.location.href = "/login";
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "40px",
+        background: "#f6f8fb",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "900px",
+          margin: "0 auto",
+          background: "#fff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "16px",
+          padding: "30px",
+        }}
+      >
+        <span className="eyebrow">CUSTOMER PORTAL</span>
+
+        <h1>Welcome to EventFlow</h1>
+
+        <p className="muted">
+          Customer authentication is working. The full customer portal is being
+          developed.
+        </p>
+
+        {user && (
+          <div style={{ marginTop: "24px" }}>
+            <p>
+              <strong>Name:</strong> {user.name}
+            </p>
+
+            <p>
+              <strong>Email:</strong> {user.email}
+            </p>
+
+            <p>
+              <strong>Role:</strong> {user.role}
+            </p>
+
+            <p>
+              <strong>Customer:</strong> {user.customer?.customerCode || "-"}
+            </p>
+          </div>
+        )}
+
+        <button
+          className="primary-button"
+          onClick={logout}
+          style={{ marginTop: "20px" }}
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public */}
-        <Route path="/" element={<PublicHome />} />
-
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
@@ -62,22 +120,10 @@ export default function App() {
           path="/portal"
           element={
             <ProtectedRoute allowedRoles={["CUSTOMER"]}>
-              <CustomerLayout />
+              <CustomerPortalPlaceholder />
             </ProtectedRoute>
           }
-        >
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<CustomerDashboard />} />
-          <Route path="company" element={<MyCompany />} />
-          <Route path="profile" element={<MyProfile />} />
-          <Route path="requests" element={<CustomerRequests />} />
-          <Route path="requests/new" element={<CreateCustomerRequest />} />
-          <Route path="requests/:id" element={<CustomerRequestDetail />} />
-          <Route path="quotations" element={<CustomerQuotations />} />
-          <Route path="quotations/:id" element={<CustomerQuotationDetail />} />
-          <Route path="events" element={<CustomerEvents />} />
-          <Route path="events/:id" element={<CustomerEventDetail />} />
-        </Route>
+        />
 
         {/* Internal EventFlow */}
         <Route
@@ -116,7 +162,7 @@ export default function App() {
           <Route path="/departments" element={<Departments />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
