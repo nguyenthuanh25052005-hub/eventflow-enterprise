@@ -6,7 +6,6 @@ import authRoutes from "./routes/auth.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import eventRequestRoutes from "./routes/eventRequest.routes.js";
-import customerRequestRoutes from "./routes/customerRequest.routes.js";
 import quotationRoutes from "./routes/quotation.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import taskRoutes from "./routes/task.routes.js";
@@ -36,18 +35,12 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(
-        new Error(`CORS blocked origin: ${origin}`),
-      );
+      return callback(new Error(`CORS blocked origin: ${origin}`));
     },
     credentials: true,
   }),
 );
 
-app.use(express.json({ limit: "2mb" }));
-app.use(morgan("dev"));
-
-app.get("/api/health", (req, res) =>
 app.use(
   express.json({
     limit: "2mb",
@@ -57,12 +50,16 @@ app.use(
 app.use(morgan("dev"));
 
 app.get("/api/health", (req, res) => {
- main  res.json({
+  res.json({
     status: "ok",
     service: "EventFlow Enterprise API",
     version: "0.2",
-  }),
-);
+  });
+});
+
+// =====================================
+// PUBLIC / AUTH
+// =====================================
 
 app.use("/api/auth", authRoutes);
 
@@ -74,11 +71,6 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/event-requests", eventRequestRoutes);
 app.use("/api/quotations", quotationRoutes);
-app.use("/api/customer-requests", customerRequestRoutes);
-
-/* Customer Portal */
-app.use("/api/customer-portal", customerPortalRoutes);
-
 app.use("/api/events", eventRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/finance", financeRoutes);
@@ -87,13 +79,21 @@ app.use("/api/suppliers", supplierRoutes);
 
 app.use("/api/event-suppliers", eventSupplierRoutes);
 
-app.use(
-  "/api/event-supplier-workflow",
-  eventSupplierWorkflowRoutes,
-);
+app.use("/api/event-supplier-workflow", eventSupplierWorkflowRoutes);
 
 app.use("/api/employees", employeeRoutes);
 app.use("/api/departments", departmentRoutes);
+
+// =====================================
+// CUSTOMER PORTAL
+// =====================================
+
+app.use("/api/customer-portal", customerPortalRoutes);
+
+// =====================================
+// ERROR HANDLERS
+// Luôn phải nằm cuối cùng
+// =====================================
 
 app.use(notFound);
 app.use(errorHandler);
