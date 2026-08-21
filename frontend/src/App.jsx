@@ -47,7 +47,7 @@ const INTERNAL_ROLES = [
 export default function App() {
   return (
     <BrowserRouter>
-      <Route>
+      <Routes>
 
         <Route path="/login" element={<Login />} />
 
@@ -198,5 +198,6 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
 
 
