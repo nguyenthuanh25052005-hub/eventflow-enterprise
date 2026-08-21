@@ -48,7 +48,16 @@ app.use(express.json({ limit: "2mb" }));
 app.use(morgan("dev"));
 
 app.get("/api/health", (req, res) =>
-  res.json({
+app.use(
+  express.json({
+    limit: "2mb",
+  }),
+);
+
+app.use(morgan("dev"));
+
+app.get("/api/health", (req, res) => {
+ main  res.json({
     status: "ok",
     service: "EventFlow Enterprise API",
     version: "0.2",
@@ -56,6 +65,11 @@ app.get("/api/health", (req, res) =>
 );
 
 app.use("/api/auth", authRoutes);
+
+// =====================================
+// INTERNAL APIs
+// =====================================
+
 app.use("/api/customers", customerRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/event-requests", eventRequestRoutes);

@@ -6,10 +6,10 @@ import {
   listDepartments,
   updateDepartment,
 } from "../controllers/department.controller.js";
-import { allowRoles, protect } from "../middleware/auth.js";
+import { allowRoles, protect, internalOnly } from "../middleware/auth.js";
 
 const router = Router();
-router.use(protect);
+router.use(protect, internalOnly);
 router.get("/", listDepartments);
 router.get("/:id", getDepartment);
 router.post("/", allowRoles("SUPER_ADMIN", "ADMIN"), createDepartment);

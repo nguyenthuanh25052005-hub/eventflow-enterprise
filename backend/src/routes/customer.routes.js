@@ -6,10 +6,10 @@ import {
   updateCustomer,
   deleteCustomer,
 } from "../controllers/customer.controller.js";
-import { allowRoles, protect } from "../middleware/auth.js";
+import { allowRoles, protect, internalOnly } from "../middleware/auth.js";
 
 const router = Router();
-router.use(protect);
+router.use(protect, internalOnly);
 router.get("/", listCustomers);
 router.get("/:id", getCustomer);
 router.post(

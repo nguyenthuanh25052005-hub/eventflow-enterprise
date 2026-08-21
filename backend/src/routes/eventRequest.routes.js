@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect, allowRoles } from "../middleware/auth.js";
+import { protect, allowRoles, internalOnly } from "../middleware/auth.js";
 import {
   listEventRequests,
   getEventRequest,
@@ -8,7 +8,7 @@ import {
   convertEventRequest,
 } from "../controllers/eventRequest.controller.js";
 const router = Router();
-router.use(protect);
+router.use(protect, internalOnly);
 router.get("/", listEventRequests);
 router.get("/:id", getEventRequest);
 router.post(

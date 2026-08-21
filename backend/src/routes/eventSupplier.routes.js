@@ -1,5 +1,5 @@
 ﻿import { Router } from "express";
-import { protect } from "../middleware/auth.js";
+import { protect, internalOnly } from "../middleware/auth.js";
 
 import {
   createEventSupplier,
@@ -12,7 +12,7 @@ import {
 
 const router = Router();
 
-router.use(protect);
+router.use(protect, internalOnly);
 
 // Route cố định phải đứng trước /:id
 router.get("/statuses", getEventSupplierStatuses);

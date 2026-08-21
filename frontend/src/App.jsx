@@ -8,6 +8,7 @@ import {
 import AppLayout from "./layouts/AppLayout";
 import CustomerLayout from "./layouts/CustomerLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -46,18 +47,11 @@ const INTERNAL_ROLES = [
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* =========================
-            PUBLIC
-        ========================== */}
+      <Route>
 
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
-
-        {/* =========================
-            CUSTOMER PORTAL
-        ========================== */}
 
         <Route
           path="/portal"
@@ -67,7 +61,6 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {/* Customer login -> My Requests */}
           <Route
             index
             element={
@@ -77,53 +70,40 @@ export default function App() {
               />
             }
           />
-
-          {/* My Requests */}
           <Route
             path="requests"
             element={<CustomerRequests />}
           />
-
-          {/* Create Request */}
           <Route
             path="requests/new"
             element={<CreateCustomerRequest />}
           />
 
-          {/* Request Detail */}
           <Route
             path="requests/:id"
             element={<CustomerRequestDetail />}
           />
 
-          {/* My Quotations */}
           <Route
             path="quotations"
             element={<CustomerQuotations />}
           />
 
-          {/* Quotation Detail + Approve / Reject */}
           <Route
             path="quotations/:id"
             element={<CustomerQuotationDetail />}
           />
 
-          {/* My Events */}
           <Route
             path="events"
             element={<CustomerEvents />}
           />
 
-          {/* Event Detail */}
           <Route
             path="events/:id"
             element={<CustomerEventDetail />}
           />
         </Route>
-
-        {/* =========================
-            INTERNAL EVENTFLOW
-        ========================== */}
 
         <Route
           element={
@@ -204,10 +184,6 @@ export default function App() {
             element={<Departments />}
           />
         </Route>
-
-        {/* =========================
-            FALLBACK
-        ========================== */}
 
         <Route
           path="*"
