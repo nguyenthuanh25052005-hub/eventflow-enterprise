@@ -19,7 +19,12 @@ export default function Login() {
       const data = await authApi.login(form);
       localStorage.setItem("eventflow_token", data.token);
       localStorage.setItem("eventflow_user", JSON.stringify(data.user));
-      navigate("/dashboard");
+
+      if (data.user.role === "CUSTOMER") {
+        navigate("/portal");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
