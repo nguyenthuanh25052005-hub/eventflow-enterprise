@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowRight, Building2, UserRound } from "lucide-react";
 import { authApi } from "../api/authApi";
 
 export default function Login() {
+  const [searchParams] = useSearchParams();
+  const isInternal = searchParams.get("mode") === "internal";
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -46,30 +49,38 @@ export default function Login() {
 
           <div>
             <h1>EventFlow</h1>
-            <p>Enterprise Event Operations</p>
+            <p>{isInternal ? "Enterprise Event Operations" : "Customer Event Portal"}</p>
           </div>
         </div>
 
         <div className="login-copy">
-          <span className="eyebrow">EVENT MANAGEMENT PLATFORM</span>
+          <span className="eyebrow">{isInternal ? "EVENT MANAGEMENT PLATFORM" : "CUSTOMER PORTAL"}</span>
 
-          <h2>Run every event from one workspace.</h2>
+          <h2>{isInternal ? "Run every event from one workspace." : "Your events, always within reach."}</h2>
 
           <p>
-            Manage customers, requests, quotations, teams, tasks, budgets and
-            on-site operations in one connected system.
+            {isInternal
+              ? "Manage customers, requests, quotations, teams, tasks, budgets and on-site operations in one connected system."
+              : "Create event requests, review quotations and stay connected with your EventFlow team from one secure portal."}
           </p>
         </div>
       </div>
 
-      <form className="login-card" onSubmit={submit}>
-        <span className="eyebrow">WELCOME BACK</span>
+      <Link className="login-audience-switch" to={isInternal ? "/login" : "/login?mode=internal"}>
+        {isInternal ? <UserRound size={16} /> : <Building2 size={16} />}
+        <span><small>{isInternal ? "EVENT CUSTOMER" : "EVENTFLOW TEAM"}</small><strong>{isInternal ? "Customer sign in" : "Internal member sign in"}</strong></span>
+        <ArrowRight size={15} />
+      </Link>
 
-        <h2>Sign in to EventFlow</h2>
+      <form className="login-card" onSubmit={submit}>
+        <span className="eyebrow">{isInternal ? "TEAM ACCESS" : "CUSTOMER ACCESS"}</span>
+
+        <h2>{isInternal ? "Internal member sign in" : "Customer sign in"}</h2>
 
         <p className="muted">
-          Sign in with your EventFlow account. Customers and internal team
-          members use the same secure login.
+          {isInternal
+            ? "Use your EventFlow work account to access internal operations."
+            : "Sign in to follow requests, quotations and upcoming events."}
         </p>
 
         <label>
@@ -116,9 +127,9 @@ export default function Login() {
           {loading ? "Signing in..." : "Sign in"}
         </button>
 
-        <p className="muted">
+        {!isInternal && <p className="muted login-register-prompt">
           New customer? <Link to="/register">Create customer account</Link>
-        </p>
+        </p>}
       </form>
     </div>
   );
