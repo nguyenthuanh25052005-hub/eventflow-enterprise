@@ -2,6 +2,9 @@ import "dotenv/config";
 import { connectDB } from "../config/db.js";
 import User from "../models/User.js";
 import Customer from "../models/Customer.js";
+import bcrypt from "bcryptjs";
+import Employee from "../models/Employee.js";
+import Department from "../models/Department.js";
 import EventRequest from "../models/EventRequest.js";
 import Quotation from "../models/Quotation.js";
 import Event from "../models/Event.js";
@@ -42,6 +45,8 @@ await Promise.all([
   Expense.deleteMany({}),
   Attendee.deleteMany({}),
   Supplier.deleteMany({}),
+  Employee.deleteMany({}),
+  Department.deleteMany({}),
 ]);
 
 // =========================
@@ -121,6 +126,29 @@ for (const data of customerData) {
   const customer = await Customer.create(data);
   customers.push(customer);
 }
+// =========================
+// CUSTOMER USERS
+// =========================
+
+const customerPassword = await bcrypt.hash("Customer@123456", 12);
+
+await User.findOneAndUpdate(
+  {
+    email: "customer@novatech.local",
+  },
+  {
+    name: "NovaTech Customer",
+    email: "customer@novatech.local",
+    passwordHash: customerPassword,
+    role: "CUSTOMER",
+    customer: customers[0]._id,
+    status: "ACTIVE",
+  },
+  {
+    upsert: true,
+    new: true,
+  },
+);
 // =========================
 // EVENT REQUESTS
 // =========================
