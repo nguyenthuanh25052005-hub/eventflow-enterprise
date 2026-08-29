@@ -8,6 +8,9 @@ import Quotation from "../models/Quotation.js";
 import Attendee from "../models/Attendee.js";
 
 export const getDashboard = asyncHandler(async (req, res) => {
+  const financeRoles = ["SUPER_ADMIN", "ADMIN", "FINANCE"];
+
+  const canViewFinance = financeRoles.includes(req.user.role);
   const now = new Date();
   const in30 = new Date(now.getTime() + 30 * 86400000);
   const [
@@ -48,8 +51,21 @@ export const getDashboard = asyncHandler(async (req, res) => {
     Attendee.countDocuments({ status: "CHECKED_IN" }),
     Attendee.countDocuments({ status: { $ne: "CANCELLED" } }),
   ]);
-  const revenue = approvedQuotes.reduce((s, x) => s + Number(x.total || 0), 0);
-  const cost = approvedExpenses.reduce((s, x) => s + Number(x.amount || 0), 0);
+  const revenue = canViewFinance
+    ? approvedQuotes.reduce(
+        (sum, quotation) => sum + Number(quotation.total || 0),
+        0,
+      )
+    : null;
+
+  const cost = canViewFinance
+    ? approvedExpenses.reduce(
+        (sum, expense) => sum + Number(expense.amount || 0),
+        0,
+      )
+    : null;
+
+  const grossMargin = canViewFinance ? revenue - cost : null;
   const pipeline = await EventRequest.aggregate([
     {
       $group: {
@@ -66,10 +82,13 @@ export const getDashboard = asyncHandler(async (req, res) => {
     openRequests,
     upcomingEvents,
     overdueTasks,
+
     revenue,
     cost,
-    grossMargin: revenue - cost,
+    grossMargin,
+
     checkInRate: registered ? Math.round((checkedIn / registered) * 100) : 0,
+
     events,
     tasks,
     pipeline,

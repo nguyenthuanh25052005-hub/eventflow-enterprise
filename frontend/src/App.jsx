@@ -89,31 +89,122 @@ export default function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
 
-          <Route path="/customers" element={<Customers />} />
+          <Route
+            path="/customers"
+            element={
+              <ProtectedRoute allowedRoles={CRM_ROLES}>
+                <Customers />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/event-requests" element={<EventRequests />} />
+          <Route
+            path="/event-requests"
+            element={
+              <ProtectedRoute allowedRoles={CRM_ROLES}>
+                <EventRequests />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/quotations" element={<Quotations />} />
+          <Route
+            path="/quotations"
+            element={
+              <ProtectedRoute allowedRoles={QUOTATION_ROLES}>
+                <Quotations />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/events" element={<Events />} />
+          <Route
+            path="/events"
+            element={
+              <ProtectedRoute allowedRoles={OPERATION_ROLES}>
+                <Events />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/events/:id" element={<EventDetail />} />
+          <Route
+            path="/events/:id"
+            element={
+              <ProtectedRoute allowedRoles={OPERATION_ROLES}>
+                <EventDetail />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/tasks" element={<Tasks />} />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute allowedRoles={OPERATION_ROLES}>
+                <Tasks />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/suppliers" element={<Suppliers />} />
+          <Route
+            path="/suppliers"
+            element={
+              <ProtectedRoute allowedRoles={SUPPLIER_ROLES}>
+                <Suppliers />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/attendees" element={<Attendees />} />
+          <Route
+            path="/attendees"
+            element={
+              <ProtectedRoute allowedRoles={OPERATION_ROLES}>
+                <Attendees />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/finance" element={<Finance />} />
+          <Route
+            path="/finance"
+            element={
+              <ProtectedRoute allowedRoles={FINANCE_ROLES}>
+                <Finance />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/reports" element={<Reports />} />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute allowedRoles={FINANCE_ROLES}>
+                <Reports />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/settings" element={<Settings />} />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={ADMIN_ROLES}>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/employees" element={<Employees />} />
+          <Route
+            path="/employees"
+            element={
+              <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+                <Employees />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/departments" element={<Departments />} />
+          <Route
+            path="/departments"
+            element={
+              <ProtectedRoute allowedRoles={ADMIN_ROLES}>
+                <Departments />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -121,3 +212,29 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
+const CRM_ROLES = ["SUPER_ADMIN", "ADMIN", "SALES", "EVENT_MANAGER"];
+
+const QUOTATION_ROLES = [
+  "SUPER_ADMIN",
+  "ADMIN",
+  "SALES",
+  "EVENT_MANAGER",
+  "FINANCE",
+];
+
+const OPERATION_ROLES = ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER", "STAFF"];
+
+const SUPPLIER_ROLES = [
+  "SUPER_ADMIN",
+  "ADMIN",
+  "EVENT_MANAGER",
+  "STAFF",
+  "FINANCE",
+];
+
+const FINANCE_ROLES = ["SUPER_ADMIN", "ADMIN", "FINANCE"];
+
+const EMPLOYEE_ROLES = ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER"];
+
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN"];

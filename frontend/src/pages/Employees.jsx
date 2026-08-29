@@ -23,6 +23,7 @@ import { positionLabels, skillsByPosition } from "../constants/people";
 const emptyEmployee = {
   name: "",
   email: "",
+  password: "",
   phone: "",
   avatar: "",
   department: "",
@@ -31,7 +32,6 @@ const emptyEmployee = {
   employmentType: "FULL_TIME",
   status: "ACTIVE",
 };
-
 const employmentLabels = {
   FULL_TIME: "Full time",
   PART_TIME: "Part time",
@@ -87,6 +87,7 @@ export default function Employees() {
     setForm({
       name: employee.name || "",
       email: employee.email || "",
+      password: "",
       phone: employee.phone || "",
       avatar: employee.avatar || "",
       department: employee.department?._id || employee.department || "",
@@ -111,6 +112,9 @@ export default function Employees() {
     const payload = {
       ...form,
     };
+    if (editingId && !form.password) {
+      delete payload.password;
+    }
 
     try {
       if (editingId) await employeeApi.update(editingId, payload);
@@ -217,7 +221,10 @@ export default function Employees() {
             placeholder="Search name, code, email, phone, position or skill..."
           />
         </div>
-        <select value={department} onChange={(e) => setDepartment(e.target.value)}>
+        <select
+          value={department}
+          onChange={(e) => setDepartment(e.target.value)}
+        >
           <option value="">All departments</option>
           {departments.map((item) => (
             <option value={item._id} key={item._id}>
@@ -261,7 +268,9 @@ export default function Employees() {
                     {employee.department?.departmentCode || "—"}
                   </span>
                 </td>
-                <td>{positionLabels[employee.position] || employee.position}</td>
+                <td>
+                  {positionLabels[employee.position] || employee.position}
+                </td>
                 <td>{employmentLabels[employee.employmentType]}</td>
                 <td>
                   <span className="contact-line">
@@ -307,11 +316,22 @@ export default function Employees() {
         size="lg"
         footer={
           <>
-            <button className="secondary-button" onClick={() => setFormOpen(false)}>
+            <button
+              className="secondary-button"
+              onClick={() => setFormOpen(false)}
+            >
               Cancel
             </button>
-            <button className="primary-button" form="employee-form" disabled={saving}>
-              {saving ? "Saving..." : editingId ? "Save changes" : "Create employee"}
+            <button
+              className="primary-button"
+              form="employee-form"
+              disabled={saving}
+            >
+              {saving
+                ? "Saving..."
+                : editingId
+                  ? "Save changes"
+                  : "Create employee"}
             </button>
           </>
         }
@@ -376,6 +396,34 @@ export default function Employees() {
             />
           </label>
           <label>
+            {editingId ? "New password" : "Password"}
+
+            <input
+              type="password"
+              required={!editingId}
+              minLength={8}
+              value={form.password}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  password: e.target.value,
+                })
+              }
+              placeholder={
+                editingId
+                  ? "Leave blank to keep current password"
+                  : "Minimum 8 characters"
+              }
+              autoComplete="new-password"
+            />
+
+            <small>
+              {editingId
+                ? "Leave blank if you do not want to change the password."
+                : "Employee will use this password to sign in."}
+            </small>
+          </label>
+          <label>
             Phone
             <input
               value={form.phone}
@@ -418,7 +466,8 @@ export default function Employees() {
             <div className="skill-picker-heading">
               <span>Skills</span>
               <small>
-                {form.skills.length} selected · Recommended for {positionLabels[form.position]}
+                {form.skills.length} selected · Recommended for{" "}
+                {positionLabels[form.position]}
               </small>
             </div>
             <div className="skill-picker">
@@ -428,7 +477,9 @@ export default function Employees() {
                   <button
                     type="button"
                     key={skill}
-                    className={selected ? "skill-option selected" : "skill-option"}
+                    className={
+                      selected ? "skill-option selected" : "skill-option"
+                    }
                     onClick={() => toggleSkill(skill)}
                     aria-pressed={selected}
                   >
@@ -508,7 +559,11 @@ function EmployeeProfile({ employee }) {
       </div>
       <div className="employee-detail-grid">
         <ProfileField icon={Mail} label="Email" value={employee.email || "—"} />
-        <ProfileField icon={Phone} label="Phone" value={employee.phone || "—"} />
+        <ProfileField
+          icon={Phone}
+          label="Phone"
+          value={employee.phone || "—"}
+        />
         <ProfileField
           icon={Building2}
           label="Department"
@@ -526,7 +581,9 @@ function EmployeeProfile({ employee }) {
           {(employee.skills || []).map((skill) => (
             <span key={skill}>{skill}</span>
           ))}
-          {!employee.skills?.length && <p className="muted">No skills recorded.</p>}
+          {!employee.skills?.length && (
+            <p className="muted">No skills recorded.</p>
+          )}
         </div>
       </div>
     </div>

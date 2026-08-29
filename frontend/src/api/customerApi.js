@@ -6,5 +6,9 @@ export const customerApi = {
   create: (payload) => client.post("/customers", payload).then((r) => r.data),
   update: (id, payload) =>
     client.put(`/customers/${id}`, payload).then((r) => r.data),
+  createPortalAccount: (id, payload) =>
+  client
+    .post(`/customers/${id}/portal-account`, payload)
+    .then((r) => r.data),
   remove: (id) => client.delete(`/customers/${id}`).then((r) => r.data),
 };

@@ -29,42 +29,103 @@ import { initials } from "../utils/format";
 const groups = [
   {
     label: "Workspace",
-    items: [["/dashboard", "Command center", LayoutDashboard]],
+    items: [
+      [
+        "/dashboard",
+        "Command center",
+        LayoutDashboard,
+        ["SUPER_ADMIN", "ADMIN", "SALES", "EVENT_MANAGER", "FINANCE", "STAFF"],
+      ],
+    ],
   },
+
   {
     label: "Sales & CRM",
     items: [
-      ["/customers", "Customers", Building2],
-      ["/event-requests", "Event requests", ClipboardList],
-      ["/quotations", "Quotations", FileText],
+      [
+        "/customers",
+        "Customers",
+        Building2,
+        ["SUPER_ADMIN", "ADMIN", "SALES", "EVENT_MANAGER"],
+      ],
+
+      [
+        "/event-requests",
+        "Event requests",
+        ClipboardList,
+        ["SUPER_ADMIN", "ADMIN", "SALES", "EVENT_MANAGER"],
+      ],
+
+      [
+        "/quotations",
+        "Quotations",
+        FileText,
+        ["SUPER_ADMIN", "ADMIN", "SALES", "EVENT_MANAGER", "FINANCE"],
+      ],
     ],
   },
+
   {
     label: "Operations",
     items: [
-      ["/events", "Events", CalendarDays],
-      ["/tasks", "Tasks", ListTodo],
-      ["/suppliers", "Suppliers", Truck],
-      ["/attendees", "Attendees & Check-in", ScanLine],
+      [
+        "/events",
+        "Events",
+        CalendarDays,
+        ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER", "STAFF"],
+      ],
+
+      [
+        "/tasks",
+        "Tasks",
+        ListTodo,
+        ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER", "STAFF"],
+      ],
+
+      [
+        "/suppliers",
+        "Suppliers",
+        Truck,
+        ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER", "STAFF", "FINANCE"],
+      ],
+
+      [
+        "/attendees",
+        "Attendees & Check-in",
+        ScanLine,
+        ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER", "STAFF"],
+      ],
     ],
   },
+
   {
     label: "People",
     items: [
-      ["/employees", "Employees", UsersRound],
-      ["/departments", "Departments", Network],
+      [
+        "/employees",
+        "Employees",
+        UsersRound,
+        ["SUPER_ADMIN", "ADMIN", "EVENT_MANAGER"],
+      ],
+
+      ["/departments", "Departments", Network, ["SUPER_ADMIN", "ADMIN"]],
     ],
   },
+
   {
     label: "Business",
     items: [
-      ["/finance", "Finance", WalletCards],
-      ["/reports", "Reports", BarChart3],
+      ["/finance", "Finance", WalletCards, ["SUPER_ADMIN", "ADMIN", "FINANCE"]],
+
+      ["/reports", "Reports", BarChart3, ["SUPER_ADMIN", "ADMIN", "FINANCE"]],
     ],
   },
+
   {
     label: "Administration",
-    items: [["/settings", "Settings & Roles", Settings]],
+    items: [
+      ["/settings", "Settings & Roles", Settings, ["SUPER_ADMIN", "ADMIN"]],
+    ],
   },
 ];
 const pageNames = {
@@ -88,6 +149,19 @@ export default function AppLayout() {
     loc = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const user = JSON.parse(localStorage.getItem("eventflow_user") || "{}");
+
+  const role = user.role || "SUPER_ADMIN";
+
+  const visibleGroups = groups
+    .map((group) => ({
+      ...group,
+
+      items: group.items.filter(([, , , allowedRoles]) =>
+        allowedRoles.includes(role),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+
   const segment = loc.pathname.split("/")[1] || "dashboard";
   function logout() {
     localStorage.removeItem("eventflow_token");
@@ -123,7 +197,7 @@ export default function AppLayout() {
           <ChevronDown size={15} />
         </div>
         <nav>
-          {groups.map((g) => (
+          {visibleGroups.map((g) => (
             <div className="nav-group" key={g.label}>
               <div className="nav-group-label">{g.label}</div>
               {g.items.map(([to, label, Icon]) => (
@@ -171,13 +245,17 @@ export default function AppLayout() {
               <Bell size={18} />
               <i className="notification-dot" />
             </button>
-            <button
-              className="quick-create"
-              onClick={() => navigate("/event-requests")}
-            >
-              <Plus size={16} />
-              Create
-            </button>
+            {["SUPER_ADMIN", "ADMIN", "SALES", "EVENT_MANAGER"].includes(
+              role,
+            ) && (
+              <button
+                className="quick-create"
+                onClick={() => navigate("/event-requests")}
+              >
+                <Plus size={16} />
+                Create
+              </button>
+            )}
           </div>
         </div>
         <Outlet />

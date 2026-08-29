@@ -30,6 +30,19 @@ const pipeOrder = [
 export default function Dashboard() {
   const [d, setD] = useState(null);
   const nav = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("eventflow_user") || "{}");
+
+  const role = user.role || "";
+
+  const canViewFinance = ["SUPER_ADMIN", "ADMIN", "FINANCE"].includes(role);
+
+  const canCreateRequest = [
+    "SUPER_ADMIN",
+    "ADMIN",
+    "SALES",
+    "EVENT_MANAGER",
+  ].includes(role);
   useEffect(() => {
     dashboardApi.get().then(setD).catch(console.error);
   }, []);
@@ -59,13 +72,15 @@ export default function Dashboard() {
               <CalendarDays size={16} />
               Calendar
             </button>
-            <button
-              className="primary-button"
-              onClick={() => nav("/event-requests")}
-            >
-              <Plus size={17} />
-              New event request
-            </button>
+            {canCreateRequest && (
+              <button
+                className="primary-button"
+                onClick={() => nav("/event-requests")}
+              >
+                <Plus size={17} />
+                New event request
+              </button>
+            )}
           </>
         }
       />
@@ -98,16 +113,21 @@ export default function Dashboard() {
           meta="Need intervention"
           alert={data.overdueTasks > 0}
         />
-        <Kpi
-          icon={WalletCards}
-          label="Gross margin"
-          value={money(data.grossMargin)}
-          meta={`${money(data.revenue)} approved revenue`}
-          wide
-        />
+        {canViewFinance && (
+          <Kpi
+            icon={WalletCards}
+            label="Gross margin"
+            value={money(data.grossMargin)}
+            meta={`${money(data.revenue)} approved revenue`}
+            wide
+          />
+        )}
       </section>
 
-      <section className="dashboard-layout">
+      <section
+        className="dashboard-layout"
+        style={!canViewFinance ? { gridTemplateColumns: "1fr" } : undefined}
+      >
         <div className="panel panel-pipeline">
           <div className="panel-heading">
             <div>
@@ -142,42 +162,35 @@ export default function Dashboard() {
             })}
           </div>
         </div>
-        <div className="panel finance-snapshot">
-          <div className="panel-heading compact">
-            <div>
-              <span className="panel-kicker">FINANCE</span>
-              <h3>Business snapshot</h3>
+        {canViewFinance && (
+          <div className="panel finance-snapshot">
+            <div className="panel-heading compact">
+              <div>
+                <span className="panel-kicker">FINANCE</span>
+                <h3>Business snapshot</h3>
+              </div>
+
+              <TrendingUp size={20} />
             </div>
-            <TrendingUp size={20} />
-          </div>
-          <div className="finance-big">
-            <span>Approved revenue</span>
-            <strong>{money(data.revenue)}</strong>
-          </div>
-          <div className="finance-pairs">
-            <div>
-              <span>Approved cost</span>
-              <b>{money(data.cost)}</b>
+
+            <div className="finance-big">
+              <span>Approved revenue</span>
+              <strong>{money(data.revenue)}</strong>
             </div>
-            <div>
-              <span>Gross margin</span>
-              <b>{money(data.grossMargin)}</b>
+
+            <div className="finance-pairs">
+              <div>
+                <span>Approved cost</span>
+                <b>{money(data.cost)}</b>
+              </div>
+
+              <div>
+                <span>Gross margin</span>
+                <b>{money(data.grossMargin)}</b>
+              </div>
             </div>
           </div>
-          <div className="margin-bar">
-            <span
-              style={{
-                width: `${data.revenue ? Math.max(0, Math.min(100, (data.grossMargin / data.revenue) * 100)) : 0}%`,
-              }}
-            />
-          </div>
-          <small>
-            {data.revenue
-              ? Math.round((data.grossMargin / data.revenue) * 100)
-              : 0}
-            % margin across approved quotations
-          </small>
-        </div>
+        )}
       </section>
 
       <section className="dashboard-layout lower">

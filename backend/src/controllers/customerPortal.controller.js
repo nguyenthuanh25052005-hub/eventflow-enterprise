@@ -6,7 +6,7 @@ import Customer from "../models/Customer.js";
 import EventRequest from "../models/EventRequest.js";
 import Quotation from "../models/Quotation.js";
 import Event from "../models/Event.js";
-
+import { createAuditLog } from "../services/auditLog.service.js";
 import {
   REQUEST_STATUS,
   assertManualTransition,
@@ -533,12 +533,14 @@ export const decideMyQuotation = asyncHandler(async (req, res) => {
 
   if (!customerId) return;
 
+  // Kiểm tra ID quotation hợp lệ
   if (!isValidId(req.params.id)) {
     return res.status(404).json({
       message: "Quotation not found",
     });
   }
 
+  // Chỉ chấp nhận APPROVE hoặc REJECT
   const decision = String(req.body.decision || "").toUpperCase();
 
   if (!["APPROVE", "REJECT"].includes(decision)) {
@@ -547,6 +549,7 @@ export const decideMyQuotation = asyncHandler(async (req, res) => {
     });
   }
 
+  // Chỉ lấy quotation thuộc đúng customer đang đăng nhập
   const quotation = await Quotation.findOne({
     _id: req.params.id,
     customer: customerId,
@@ -558,22 +561,47 @@ export const decideMyQuotation = asyncHandler(async (req, res) => {
     });
   }
 
-  // Customer chỉ được quyết định báo giá
-  // đã được internal team gửi.
+  // Customer chỉ được quyết định quotation đã SENT
   if (quotation.status !== "SENT") {
     return res.status(409).json({
       message: "Only a SENT quotation can be approved or rejected",
     });
   }
 
+  // =====================================
+  // CHECK EXPIRATION
+  // =====================================
+
   if (quotation.validUntil && new Date(quotation.validUntil) < new Date()) {
+    const oldStatus = quotation.status;
+
     quotation.status = "EXPIRED";
+
     await quotation.save();
+
+    await createAuditLog({
+      req,
+      action: "EXPIRE",
+      module: "QUOTATION",
+      recordId: quotation._id,
+
+      oldData: {
+        status: oldStatus,
+      },
+
+      newData: {
+        status: "EXPIRED",
+      },
+    });
 
     return res.status(409).json({
       message: "Quotation has expired",
     });
   }
+
+  // =====================================
+  // GET EVENT REQUEST
+  // =====================================
 
   const request = await EventRequest.findOne({
     _id: quotation.eventRequest,
@@ -586,21 +614,135 @@ export const decideMyQuotation = asyncHandler(async (req, res) => {
     });
   }
 
+  const oldQuotationStatus = quotation.status;
+  const oldRequestStatus = request.status;
+
+  // =====================================
+  // APPROVE
+  // =====================================
+
   if (decision === "APPROVE") {
+    // Kiểm tra xem request này đã có quotation
+    // nào APPROVED chưa.
+    const approvedQuotation = await Quotation.findOne({
+      eventRequest: quotation.eventRequest,
+
+      status: "APPROVED",
+
+      _id: {
+        $ne: quotation._id,
+      },
+    }).select("_id quotationCode");
+
+    if (approvedQuotation) {
+      return res.status(409).json({
+        success: false,
+
+        code: "EVENT_REQUEST_ALREADY_HAS_APPROVED_QUOTATION",
+
+        message: "This event request already has an approved quotation",
+      });
+    }
+
+    // Kiểm tra workflow của Event Request
     assertSystemTransition(request.status, REQUEST_STATUS.APPROVED);
 
     quotation.status = "APPROVED";
+
     request.status = REQUEST_STATUS.APPROVED;
   }
+
+  // =====================================
+  // REJECT
+  // =====================================
 
   if (decision === "REJECT") {
     assertManualTransition(request.status, REQUEST_STATUS.REJECTED);
 
     quotation.status = "REJECTED";
+
     request.status = REQUEST_STATUS.REJECTED;
   }
 
+  // =====================================
+  // SAVE
+  // =====================================
+
   await Promise.all([quotation.save(), request.save()]);
+
+  // =====================================
+  // EXPIRE OTHER QUOTATIONS
+  // =====================================
+
+  if (decision === "APPROVE") {
+    // Khi khách duyệt 1 quotation,
+    // tất cả quotation SENT khác của cùng request
+    // sẽ không còn hiệu lực.
+    await Quotation.updateMany(
+      {
+        eventRequest: quotation.eventRequest,
+
+        _id: {
+          $ne: quotation._id,
+        },
+
+        status: "SENT",
+      },
+      {
+        $set: {
+          status: "EXPIRED",
+        },
+      },
+    );
+  }
+
+  // =====================================
+  // AUDIT QUOTATION
+  // =====================================
+
+  await createAuditLog({
+    req,
+
+    action: decision,
+
+    module: "QUOTATION",
+
+    recordId: quotation._id,
+
+    oldData: {
+      status: oldQuotationStatus,
+    },
+
+    newData: {
+      status: quotation.status,
+    },
+  });
+
+  // =====================================
+  // AUDIT EVENT REQUEST
+  // =====================================
+
+  await createAuditLog({
+    req,
+
+    action: "STATUS_CHANGE",
+
+    module: "EVENT_REQUEST",
+
+    recordId: request._id,
+
+    oldData: {
+      status: oldRequestStatus,
+    },
+
+    newData: {
+      status: request.status,
+    },
+  });
+
+  // =====================================
+  // RESPONSE
+  // =====================================
 
   const populated = await Quotation.findById(quotation._id).populate(
     "eventRequest",
@@ -616,7 +758,6 @@ export const decideMyQuotation = asyncHandler(async (req, res) => {
     quotation: populated,
   });
 });
-
 // =====================================
 // EVENTS
 // =====================================

@@ -7,6 +7,8 @@ import {
   TrendingUp,
   Search,
   CheckCircle2,
+  XCircle,
+  Pencil,
 } from "lucide-react";
 import PageHeader from "../components/PageHeader";
 import Modal from "../components/Modal";
@@ -20,7 +22,7 @@ const init = {
   description: "",
   vendor: "",
   amount: "",
-  status: "PENDING",
+  status: "DRAFT",
   expenseDate: new Date().toISOString().slice(0, 10),
 };
 export default function Finance() {
@@ -28,6 +30,7 @@ export default function Finance() {
     [expenses, setExpenses] = useState([]),
     [events, setEvents] = useState([]),
     [modal, setModal] = useState(false),
+    [editingId, setEditingId] = useState(null),
     [form, setForm] = useState(init);
   async function load() {
     const [s, e] = await Promise.all([
@@ -41,18 +44,64 @@ export default function Finance() {
     load();
     eventApi.list().then((r) => setEvents(r.items || []));
   }, []);
+  function openRejectedExpense(x) {
+    setEditingId(x._id);
+
+    setForm({
+      event: x.event?._id || x.event || "",
+      category: x.category || "OTHER",
+      description: x.description || "",
+      vendor: x.vendor || "",
+      amount: x.amount || "",
+      status: "DRAFT",
+      expenseDate: x.expenseDate
+        ? new Date(x.expenseDate).toISOString().slice(0, 10)
+        : new Date().toISOString().slice(0, 10),
+    });
+
+    setModal(true);
+  }
   async function create(ev) {
     ev.preventDefault();
-    await financeApi.createExpense({
+
+    const payload = {
       ...form,
       amount: Number(form.amount || 0),
-    });
+    };
+
+    if (editingId) {
+      await financeApi.updateExpense(editingId, {
+        ...payload,
+
+        // REJECTED -> DRAFT
+        status: "DRAFT",
+      });
+    } else {
+      await financeApi.createExpense(payload);
+    }
+
     setModal(false);
+    setEditingId(null);
     setForm(init);
+
     load();
   }
   async function approve(x) {
     await financeApi.updateExpense(x._id, { status: "APPROVED" });
+    load();
+  }
+  async function rejectExpense(x) {
+    await financeApi.updateExpense(x._id, {
+      status: "REJECTED",
+    });
+
+    load();
+  }
+  async function submitExpense(x) {
+    await financeApi.updateExpense(x._id, {
+      status: "PENDING",
+    });
+
     load();
   }
   const d = data || {
@@ -69,7 +118,14 @@ export default function Finance() {
         title="Finance & profitability"
         description="Control event budgets, supplier expenses, approval status and gross margin from one operating ledger."
         actions={
-          <button className="primary-button" onClick={() => setModal(true)}>
+          <button
+            className="primary-button"
+            onClick={() => {
+              setEditingId(null);
+              setForm(init);
+              setModal(true);
+            }}
+          >
             <Plus size={16} />
             Record expense
           </button>
@@ -177,14 +233,49 @@ export default function Finance() {
                   </span>
                 </div>
                 <StatusBadge value={x.status} />
+
                 <b>{money(x.amount)}</b>
-                {x.status === "PENDING" && (
+
+                {x.status === "DRAFT" && (
                   <button
-                    className="table-action success"
-                    onClick={() => approve(x._id ? x : { _id: x._id })}
+                    className="table-action"
+                    onClick={() => submitExpense(x)}
                   >
-                    <CheckCircle2 size={14} />
-                    Approve
+                    Submit
+                  </button>
+                )}
+
+                {x.status === "PENDING" && (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "6px",
+                    }}
+                  >
+                    <button
+                      className="table-action success"
+                      onClick={() => approve(x)}
+                    >
+                      <CheckCircle2 size={14} />
+                      Approve
+                    </button>
+
+                    <button
+                      className="table-action"
+                      onClick={() => rejectExpense(x)}
+                    >
+                      <XCircle size={14} />
+                      Reject
+                    </button>
+                  </div>
+                )}
+                {x.status === "REJECTED" && (
+                  <button
+                    className="table-action"
+                    onClick={() => openRejectedExpense(x)}
+                  >
+                    <Pencil size={14} />
+                    Revise
                   </button>
                 )}
               </div>
@@ -199,17 +290,21 @@ export default function Finance() {
         open={modal}
         onClose={() => setModal(false)}
         eyebrow="COST CONTROL"
-        title="Record event expense"
+        title={editingId ? "Revise rejected expense" : "Record event expense"}
         footer={
           <>
             <button
               className="secondary-button"
-              onClick={() => setModal(false)}
+              onClick={() => {
+                setModal(false);
+                setEditingId(null);
+                setForm(init);
+              }}
             >
               Cancel
             </button>
             <button className="primary-button" form="expense-form">
-              Submit expense
+              {editingId ? "Save revision" : "Save draft"}
             </button>
           </>
         }

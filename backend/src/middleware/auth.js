@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-
+import Customer from "../models/Customer.js";
 export async function protect(req, res, next) {
   try {
     const header = req.headers.authorization || "";
@@ -10,8 +10,31 @@ export async function protect(req, res, next) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.sub);
+
     if (!user || user.status !== "ACTIVE") {
-      return res.status(401).json({ message: "User is unavailable" });
+      return res.status(401).json({
+        message: "User is unavailable",
+      });
+    }
+
+    // Nếu tài khoản là CUSTOMER,
+    // kiểm tra Customer tương ứng còn ACTIVE hay không.
+    if (user.role === "CUSTOMER") {
+      if (!user.customer) {
+        return res.status(401).json({
+          message: "Customer account is unavailable",
+        });
+      }
+
+      const customer = await Customer.findById(user.customer).select(
+        "_id status",
+      );
+
+      if (!customer || customer.status !== "ACTIVE") {
+        return res.status(401).json({
+          message: "Customer account is inactive",
+        });
+      }
     }
 
     req.user = user;

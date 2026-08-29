@@ -417,16 +417,10 @@ export default function EventRequests() {
                             </button>
                           )}
 
-                        {q.status === "SENT" &&
-                          detail.status === "NEGOTIATING" && (
-                            <button onClick={() => updateQuote(q, "APPROVED")}>
-                              Approve
-                            </button>
-                          )}
                         {q.status === "SENT" && (
-                          <button onClick={() => updateQuote(q, "APPROVED")}>
-                            Approve
-                          </button>
+                          <span className="muted">
+                            Waiting for customer decision
+                          </span>
                         )}
                       </div>
                     </div>
@@ -474,7 +468,8 @@ export default function EventRequests() {
                   <span className="panel-kicker">NEXT ACTION</span>
                   <h3>Customer decision</h3>
                   <p>
-                    Approve the sent quotation when the customer accepts it.
+                    Waiting for the customer to approve or reject the quotation
+                    in the Customer Portal.
                   </p>
                 </div>
               )}

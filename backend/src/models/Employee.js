@@ -47,6 +47,12 @@ const employeeSchema = new mongoose.Schema(
       index: true,
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
   },
   { timestamps: true },
 );

@@ -3,7 +3,7 @@ import asyncHandler from "express-async-handler";
 import EventRequest from "../models/EventRequest.js";
 import Event from "../models/Event.js";
 import Quotation from "../models/Quotation.js";
-
+import { createAuditLog } from "../services/auditLog.service.js";
 import {
   REQUEST_STATUS,
   assertManualTransition,
@@ -127,19 +127,60 @@ export const updateEventRequest = asyncHandler(async (req, res) => {
 
   const { status, requestCode, createdBy, ...editableFields } = req.body;
 
-  // Nếu client muốn chuyển stage,
-  // bắt buộc phải đi qua state machine.
+  // Những field thực sự có thể được cập nhật
+  const fieldsToTrack = Object.keys(editableFields);
+
+  if (status) {
+    fieldsToTrack.push("status");
+  }
+
+  // Lưu dữ liệu cũ
+  const oldData = {};
+
+  for (const field of fieldsToTrack) {
+    oldData[field] = item.get(field);
+  }
+
+  const oldStatus = item.status;
+
+  // Nếu muốn đổi status thì phải đúng workflow
   if (status && status !== item.status) {
     assertManualTransition(item.status, status);
 
     item.status = status;
   }
 
-  // Không cho client sửa mã nghiệp vụ
-  // hoặc người tạo.
+  // Không cho sửa requestCode và createdBy
   Object.assign(item, editableFields);
 
   await item.save();
+
+  // Chỉ lấy những field thực sự thay đổi
+  const newData = {};
+
+  for (const field of fieldsToTrack) {
+    const oldValue = oldData[field];
+    const newValue = item.get(field);
+
+    if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+      newData[field] = newValue;
+    } else {
+      delete oldData[field];
+    }
+  }
+
+  // Ghi Audit Log nếu thực sự có thay đổi
+  if (Object.keys(newData).length > 0) {
+    await createAuditLog({
+      req,
+      action: oldStatus !== item.status ? "STATUS_CHANGE" : "UPDATE",
+
+      module: "EVENT_REQUEST",
+      recordId: item._id,
+      oldData,
+      newData,
+    });
+  }
 
   const populated = await item.populate(
     "customer",
@@ -148,7 +189,6 @@ export const updateEventRequest = asyncHandler(async (req, res) => {
 
   res.json(populated);
 });
-
 // =====================================
 // CONVERT REQUEST -> EVENT
 // =====================================

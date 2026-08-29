@@ -119,13 +119,7 @@ export default function Quotations() {
                         Send
                       </button>
                     ) : q.status === "SENT" ? (
-                      <button
-                        className="table-action success"
-                        onClick={() => change(q._id, "APPROVED")}
-                      >
-                        <CheckCircle2 size={14} />
-                        Approve
-                      </button>
+                      <span className="muted">Waiting for customer</span>
                     ) : (
                       <span className="muted">—</span>
                     )}

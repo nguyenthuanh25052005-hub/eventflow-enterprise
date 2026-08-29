@@ -3,7 +3,7 @@ import Event from "../models/Event.js";
 import Task from "../models/Task.js";
 import Expense from "../models/Expense.js";
 import Attendee from "../models/Attendee.js";
-
+import { createAuditLog } from "../services/auditLog.service.js";
 export const listEvents = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.status) filter.status = req.query.status;
@@ -36,10 +36,45 @@ export const getEvent = asyncHandler(async (req, res) => {
 });
 
 export const updateEvent = asyncHandler(async (req, res) => {
-  const item = await Event.findByIdAndUpdate(req.params.id, req.body, {
+  const oldEvent = await Event.findById(req.params.id);
+
+  if (!oldEvent) {
+    return res.status(404).json({
+      success: false,
+      message: "Event not found",
+    });
+  }
+
+  const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
-  }).populate("customer");
-  if (!item) return res.status(404).json({ message: "Event not found" });
-  res.json(item);
+  });
+
+  const oldData = {};
+  const newData = {};
+
+  for (const field of Object.keys(req.body)) {
+    const oldValue = oldEvent.get(field);
+    const newValue = updatedEvent.get(field);
+
+    if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+      oldData[field] = oldValue;
+      newData[field] = newValue;
+    }
+  }
+
+  if (Object.keys(newData).length > 0) {
+    await createAuditLog({
+      req,
+      action: "UPDATE",
+      module: "EVENT",
+      recordId: updatedEvent._id,
+      oldData,
+      newData,
+    });
+  }
+
+  await updatedEvent.populate("customer");
+
+  res.json(updatedEvent);
 });

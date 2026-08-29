@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
-
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.routes.js";
 import customerRoutes from "./routes/customer.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
@@ -11,17 +12,29 @@ import eventRoutes from "./routes/event.routes.js";
 import taskRoutes from "./routes/task.routes.js";
 import financeRoutes from "./routes/finance.routes.js";
 import attendeeRoutes from "./routes/attendee.routes.js";
-import supplierRoutes from "./routes/Supplier.routes.js";
+import supplierRoutes from "./routes/supplier.routes.js";
 import employeeRoutes from "./routes/employee.routes.js";
 import departmentRoutes from "./routes/department.routes.js";
 import eventSupplierRoutes from "./routes/eventSupplier.routes.js";
 import eventSupplierWorkflowRoutes from "./routes/eventSupplierWorkflow.routes.js";
 import customerPortalRoutes from "./routes/customerPortal.routes.js";
-
+import auditLogRoutes from "./routes/auditLog.routes.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 
 const app = express();
+app.use(helmet());
+app.use("/api/audit-logs", auditLogRoutes);
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message: "Too many requests, please try again later",
+  },
+});
 
+app.use("/api", apiLimiter);
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
